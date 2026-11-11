@@ -1,0 +1,81 @@
+{
+  "specVersion": "1.1",
+  "type": "stdin",
+  "name": "dp-it-giurisprudenza-detect",
+  "version": "0.1.0",
+  "description": "Turns a case-law Source config (Corte costituzionale dumps, Cassazione partitions, CGT month windows) into catalog items. No network. Proc-protocol v1.1: spec, check, run.",
+  "author": "open-lex-it",
+  "authentication": false,
+  "actions": {
+    "spec": {
+      "description": "Return the config and output JSON schemas (Proc-protocol 1.1).",
+      "input": { "type": "object", "properties": {} },
+      "output": {
+        "type": "object",
+        "properties": {
+          "configSchema": { "type": "object" },
+          "outputSchema": { "type": "object" },
+          "protocol": { "type": "string", "const": "1.1" }
+        }
+      }
+    },
+    "check": {
+      "description": "Test Source: validates the config (bundles, Cassazione kind and year, CGT date range). No request is made; grab checks that a dump, partition or window exists.",
+      "input": { "type": "object", "properties": {} },
+      "output": { "type": "object", "properties": { "ok": { "type": "boolean" } } }
+    },
+    "run": {
+      "description": "Items are the dumps, partitions or windows whose key is not in state.seen; a refreshToken change re-emits every item.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "kind": { "enum": ["cc", "cassazione", "cgt", "snciv", "snpen", "both"] },
+          "bundles": { "type": "array", "items": { "type": "string" } },
+          "anni": { "type": "array", "items": { "type": "integer" } },
+          "only": { "type": "array", "items": { "type": "object" } },
+          "anno": { "type": "integer" },
+          "mese": { "type": "integer" },
+          "kindCass": { "enum": ["snciv", "snpen", "both"] },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "refreshToken": { "type": ["string", "null"] },
+          "state": {
+            "type": ["object", "null"],
+            "properties": { "seen": { "type": "array", "items": { "type": "string" } } }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array" },
+          "state": { "type": "object" },
+          "metrics": { "type": "object" },
+          "checks": { "type": "array" }
+        }
+      }
+    },
+    "execute": {
+      "description": "Alias of run for Proc-protocol v1 callers (ProcMon mandates execute); same input and result as run.",
+      "input": { "type": "object", "properties": {} },
+      "output": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array" },
+          "state": { "type": "object" },
+          "metrics": { "type": "object" },
+          "checks": { "type": "array" }
+        }
+      }
+    },
+    "terminate": {
+      "description": "Stop and clean up.",
+      "input": { "type": "object", "properties": {} }
+    }
+  },
+  "execution": {
+    "timeout": 600,
+    "memoryLimit": "256Mi",
+    "cpuLimit": "0.5"
+  }
+}
