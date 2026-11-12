@@ -2,7 +2,7 @@
   "specVersion": "1.1",
   "type": "stdin",
   "name": "dp-it-giurisprudenza-detect",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Turns a case-law Source config (Corte costituzionale dumps, Cassazione partitions, CGT month windows) into catalog items. No network. Proc-protocol v1.1: spec, check, run.",
   "author": "open-lex-it",
   "authentication": false,
