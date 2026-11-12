@@ -165,6 +165,20 @@ def test_protocol_loop_unknown_action_and_terminate() -> None:
     assert run.lines[0]["code"] == "config_error"
 
 
+def test_config_keys_the_host_resolves_to_null_count_as_absent(invoke: Invoke) -> None:
+    # The Manifest passes every Source config key of the pipeline; the Host resolves the ones a Source type does not declare to null.
+    nulls = {"kind": None, "bundles": None, "anni": None, "only": None, "anno": None, "mese": None, "from": None, "to": None, "refreshToken": None}
+
+    cc = invoke("run", **{**nulls, "bundles": ["massime_2001_oggi"], "state": None})
+    cass = invoke("run", **{**nulls, "kind": "snciv", "anno": 2025, "mese": 3})
+    cgt = invoke("run", **{**nulls, "from": "2024-12-01", "to": "2024-12-31"})
+
+    assert keys(cc) == ["cc:massime_2001_oggi|v1"]
+    assert keys(cass) == ["cass:snciv:2025:03|v1"]
+    assert keys(cgt) == ["cgt:2024-12-01:2024-12-31|v1"]
+    assert invoke("run", **nulls).error["code"] == "config_error"  # nothing at all is still an error
+
+
 def test_stdout_carries_protocol_events_only(invoke: Invoke) -> None:
     run = invoke("run", bundles=["massime_2001_oggi"])
 

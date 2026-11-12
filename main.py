@@ -19,6 +19,7 @@ def handle(action: str, params: dict[str, Any]) -> dict[str, Any]:
     """Runs one v1.1 action and returns result.data; raises DetectError."""
     if action == "spec":
         return v11.spec_result(detect.CONFIG_SCHEMA, detect.OUTPUT_SCHEMA)
+    params = {name: value for name, value in params.items() if value is not None}  # the Host resolves a Source config key the type does not declare to null
     token = detect.validate_refresh_token(params.get("refreshToken"))
     found = detect.build_found(params, token)  # validates the whole config
     if action == "check":
